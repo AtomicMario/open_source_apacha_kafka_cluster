@@ -2,101 +2,102 @@ version: "3.8"
 
 services:
 
-  zookeeper-server:
+  apache-zookeeper-server:
     build: .
     image: apache-kafka-ubuntu:0.3
-    container_name: zookeeper-server
+    container_name: apache-zookeeper-server
     networks:
-     - apache-kafka-network
-    hostname: "zookeeper-server"
+     - ai-kafka-network
+    hostname: apache-zookeeper-server
     command: ./run_start_zookeeper.sh
     ports:
-    - 2181:2180
+    - 2182:2181
     environment:
-      ZOOKEEPER_HOST: "zookeeper-server"
-      ZOOKEEPER_PORT: "2181"
+      ZOOKEEPER_HOST: apache-zookeeper-server
+      ZOOKEEPER_PORT: 2181
 
-  kafka-broker-1:
+  apache-kafka-broker-1:
     image: apache-kafka-ubuntu:0.3
-    container_name: kafka-broker-1
+    container_name: apache-kafka-broker-1
     networks:
-     - apache-kafka-network
-    hostname: "kafka-broker-1"
+     - ai-kafka-network
+    hostname: apache-kafka-broker-1
     command: ./run_start_server.sh
     depends_on:
-      - zookeeper-server
+      - apache-zookeeper-server
     ports:
-      - "9092:9092"
+      - 9093:9092
     environment:
-      ZOOKEEPER_HOST: "zookeeper-server"
-      ZOOKEEPER_PORT: "2181"
+      ZOOKEEPER_HOST: apache-zookeeper-server
+      ZOOKEEPER_PORT: 2181
       BROKER_ID: 1
 
-  kafka-broker-2:
+  apache-kafka-broker-2:
     image: apache-kafka-ubuntu:0.3
-    container_name: kafka-broker-2
+    container_name: apache-kafka-broker-2
     networks:
-     - apache-kafka-network
-    hostname: "kafka-broker-2"
+     - ai-kafka-network
+    hostname: apache-kafka-broker-2
     command: ./run_start_server.sh
     depends_on:
-      - zookeeper-server
+      - apache-zookeeper-server
     ports:
-      - "9093:9092"
+      - 9094:9092
     environment:
-      ZOOKEEPER_HOST: "zookeeper-server"
-      ZOOKEEPER_PORT: "2181"
+      ZOOKEEPER_HOST: apache-zookeeper-server
+      ZOOKEEPER_PORT: 2181
       BROKER_ID: 2
 
-  kafka-broker-3:
+  apache-kafka-broker-3:
     image: apache-kafka-ubuntu:0.3
-    container_name: kafka-broker-3
+    container_name: apache-kafka-broker-3
     networks:
-     - apache-kafka-network
-    hostname: "kafka-broker-3"
+     - ai-kafka-network
+    hostname: apache-kafka-broker-3
     command: ./run_start_server.sh
     depends_on:
-      - zookeeper-server
+      - apache-zookeeper-server
     ports:
-      - "9094:9092"
+      - 9095:9092
     environment:
-      ZOOKEEPER_HOST: "zookeeper-server"
-      ZOOKEEPER_PORT: "2181"
+      ZOOKEEPER_HOST: apache-zookeeper-server
+      ZOOKEEPER_PORT: 2181
       BROKER_ID: 3
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     networks:
-     - apache-kafka-network
-    hostname: "kafka-ui"
+     - ai-kafka-network
+    hostname: kafka-ui
     depends_on:
-      - zookeeper-server
+      - apache-zookeeper-server
     ports:
-      - 8080:8080
+      - 8880:8080
     environment:
-      DYNAMIC_CONFIG_ENABLED: 'true'
+      DYNAMIC_CONFIG_ENABLED: true
 
-  schema-registry:
+  kafka-schema-registry:
     image: confluentinc/cp-schema-registry
-    container_name: schema-registry
+    container_name: kafka-schema-registry
     networks:
-     - apache-kafka-network
-    hostname: "schema-registry"
+     - ai-kafka-network
+    hostname: kafka-schema-registry
     depends_on:
-      - zookeeper-server
+      - apache-zookeeper-server
     ports:
-      - 8081:8081
+      - 8881:8081
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-server:2181'
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      ALLOW_PLAINTEXT_LISTENER: 'yes'
-      KAFKA_LISTENERS: PLAINTEXT://kafka-broker-1:9092,PLAINTEXT://kafka-broker-2:9092,PLAINTEXT://kafka-broker-3:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:9092,PLAINTEXT://kafka-broker-2:9092,PLAINTEXT://kafka-broker-3:9092
-      KAFKA_BROKERCONNECT: "kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092"
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092"
-      SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
+      KAFKA_ZOOKEEPER_CONNECT: apache-zookeeper-server:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_LISTENERS: PLAINTEXT://apache-kafka-broker-1:9092,PLAINTEXT://apache-kafka-broker-2:9092,PLAINTEXT://apache-kafka-broker-3:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://apache-kafka-broker-1:9092,PLAINTEXT://apache-kafka-broker-2:9092,PLAINTEXT://apache-kafka-broker-3:9092
+      KAFKA_BROKERCONNECT: apache-kafka-broker-1:9092,apache-kafka-broker-2:9092,apache-kafka-broker-3:9092
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: apache-kafka-broker-1:9092,apache-kafka-broker-2:9092,apache-kafka-broker-3:9092
+      SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
 
 networks:
- apache-kafka-network:
-  driver: bridge
+ ai-kafka-network:
+  name: ai-kafka-network
+  external: true
