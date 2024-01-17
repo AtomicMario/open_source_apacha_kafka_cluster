@@ -8,7 +8,7 @@ RUN rm -rf /var/lib/apt/lists/*
 
 ENV KAFKA_PATH=/usr/local/kafka
 ENV PATH=$KAFKA_PATH:$KAFKA_PATH/bin:$PATH
-ENV ZOOKEEPER_HOST=zookeeper-server
+ENV ZOOKEEPER_HOST=apache-zookeeper-server
 ENV ZOOKEEPER_PORT=2181
 ENV KAFKA_PORT=9092
 
@@ -23,4 +23,4 @@ WORKDIR $KAFKA_PATH
 
 RUN chmod +x *.sh
 
-EXPOSE 2181 9092 8080
+EXPOSE 2181 9092
